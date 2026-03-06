@@ -1,31 +1,34 @@
-def findMedianSortedArrays(nums1, nums2):
-    # Ensure nums1 is the shorter array
-    if len(nums1) > len(nums2):
-        nums1, nums2 = nums2, nums1
-    
-    m, n = len(nums1), len(nums2)
-    low, high = 0, m
-    
-    while low <= high:
-        partition1 = (low + high) // 2
-        partition2 = (m + n + 1) // 2 - partition1
+class Solution:
+    def findMedianSortedArrays(self, nums1, nums2):
+        # Ensure nums1 is the shorter array to optimize binary search range
+        if len(nums1) > len(nums2):
+            nums1, nums2 = nums2, nums1
         
-        # Boundary conditions: use -inf/inf if partition is at the ends
-        l1 = nums1[partition1 - 1] if partition1 > 0 else float('-inf')
-        r1 = nums1[partition1] if partition1 < m else float('inf')
+        m, n = len(nums1), len(nums2)
+        low, high = 0, m
         
-        l2 = nums2[partition2 - 1] if partition2 > 0 else float('-inf')
-        r2 = nums2[partition2] if partition2 < n else float('inf')
-        
-        if l1 <= r2 and l2 <= r1:
-            # Correct partition found
-            if (m + n) % 2 == 1:
-                return float(max(l1, l2))
+        while low <= high:
+            partition1 = (low + high) // 2
+            partition2 = (m + n + 1) // 2 - partition1
+            
+            # Values at the edges of the partitions
+            maxLeft1 = float('-inf') if partition1 == 0 else nums1[partition1 - 1]
+            minRight1 = float('inf') if partition1 == m else nums1[partition1]
+            
+            maxLeft2 = float('-inf') if partition2 == 0 else nums2[partition2 - 1]
+            minRight2 = float('inf') if partition2 == n else nums2[partition2]
+            
+            if maxLeft1 <= minRight2 and maxLeft2 <= minRight1:
+                # Correct partition found
+                if (m + n) % 2 == 0:
+                    return (max(maxLeft1, maxLeft2) + min(minRight1, minRight2)) / 2.0
+                else:
+                    return float(max(maxLeft1, maxLeft2))
+            elif maxLeft1 > minRight2:
+                # Move left in nums1
+                high = partition1 - 1
             else:
-                return (max(l1, l2) + min(r1, r2)) / 2.0
-        elif l1 > r2:
-            # Move left in nums1
-            high = partition1 - 1
-        else:
-            # Move right in nums1
-            low = partition1 + 1
+                # Move right in nums1
+                low = partition1 + 1
+
+        
