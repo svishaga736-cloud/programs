@@ -1,23 +1,28 @@
-def reverse(x: int) -> int:
-    MAX_INT = 2147483647  # 2^31 - 1
-    MIN_INT = -2147483648 # -2^31
-    
-    res = 0
-    while x != 0:
-        # Get the last digit
-        # Note: In Python, % on negative numbers works differently than C++/Java
-        # We handle the sign manually for consistency with 32-bit logic
-        digit = int(math.fmod(x, 10)) 
-        x = int(x / 10)
+class Solution(object):
+    def reverse(self, x):
+        """
+        :type x: int
+        :rtype: int
+        """
+        # Define 32-bit signed integer boundaries
+        MIN_INT, MAX_INT = -2**31, 2**31 - 1
         
-        # Check for Overflow
-        if res > MAX_INT // 10 or (res == MAX_INT // 10 and digit > 7):
-            return 0
+        # Handle sign
+        sign = -1 if x < 0 else 1
+        x = abs(x)
         
-        # Check for Underflow
-        if res < int(MIN_INT / 10) or (res == int(MIN_INT / 10) and digit < -8):
+        res = 0
+        while x != 0:
+            # Pop the last digit
+            digit = x % 10
+            x //= 10
+            
+            # Build the reversed number
+            res = res * 10 + digit
+            
+        # Apply sign and check overflow
+        res *= sign
+        if res < MIN_INT or res > MAX_INT:
             return 0
             
-        res = (res * 10) + digit
-        
-    return res
+        return res
